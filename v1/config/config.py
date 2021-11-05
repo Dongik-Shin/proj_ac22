@@ -27,11 +27,11 @@ class Config:
     def set_mysql(self):
 
         mysql_db = pymysql.connect(
-            user=os.getenv("DB_USER"),
-            passwd=os.getenv("DB_PASSWROD"),
-            host=os.getenv("DB_HOST"),
-            port=int(os.getenv("DB_PORT")),
-            db=os.getenv("DB_DATABASE"),
+            user=os.getenv("DB_USER", "root"),
+            passwd=os.getenv("DB_PASSWROD", "localhost"),
+            host=os.getenv("DB_HOST", "127.0.0.1"),
+            port=3306,
+            db=os.getenv("DB_DATABASE", "ac22"),
             charset='utf8'
         )
 

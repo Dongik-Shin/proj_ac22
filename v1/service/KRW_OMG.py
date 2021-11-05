@@ -9,7 +9,7 @@ from module.log import *
 from common.function.common_function import *
 
 
-def monitoring(ticker="KRW-AXS"):
+def monitoring(ticker="KRW-OMG"):
 
     # init
     upbit_obj = Upbit()

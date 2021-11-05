@@ -9,7 +9,7 @@ from module.log import *
 from common.function.common_function import *
 
 
-def monitoring(ticker="KRW-AXS"):
+def monitoring(ticker="KRW-ATOM"):
 
     # init
     upbit_obj = Upbit()
@@ -83,6 +83,7 @@ def monitoring(ticker="KRW-AXS"):
                     """
                     slack_obj.post_to_slack(msg)
                     log_obj.write_log(msg)
+
             # report_term 간격으로 보고
             if cal_time_changes(flag_time) > report_term:
 
