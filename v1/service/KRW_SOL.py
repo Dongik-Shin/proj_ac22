@@ -9,7 +9,7 @@ from module.log import *
 from common.function.common_function import *
 
 
-def monitoring(ticker="KRW-ATOM"):
+def monitoring(ticker="KRW-SOL"):
 
     # init
     upbit_obj = Upbit()
@@ -18,7 +18,7 @@ def monitoring(ticker="KRW-ATOM"):
     log_obj = Log()
 
     flag_time = time.time()  # 시간 체커
-    report_term = 300        # 리포트 텀(sec)
+    report_term = 1800       # 리포트 텀(sec)
 
     # log 생성
     log_obj.create_log(
@@ -61,7 +61,7 @@ def monitoring(ticker="KRW-ATOM"):
             # sudden in/de crease check
             if changes_1min and changes_3min and changes_5min:
 
-                if changes_1min > 0.5 or changes_3min > 1 or changes_5min > 1.5:
+                if changes_1min > 0.33 or changes_3min > 0.66 or changes_5min > 0.99:
 
                     msg = f"""
                         ticker : {ticker}
@@ -73,7 +73,7 @@ def monitoring(ticker="KRW-ATOM"):
                     slack_obj.post_to_slack(msg)
                     log_obj.write_log(msg)
 
-                if changes_1min < -0.5 or changes_3min < -1 or changes_5min < -1.5:
+                if changes_1min < -0.33 or changes_3min < -0.66 or changes_5min < -0.99:
                     msg = f"""
                         ticker : {ticker}
                         sudden decrease                       
@@ -91,7 +91,7 @@ def monitoring(ticker="KRW-ATOM"):
                     ticker : {ticker}
                     current_price : {current_price}
                     min 1: {changes_1min} %
-                    min 5: {changes_3min} %
+                    min 3: {changes_3min} %
                     min 5: {changes_5min} %
                     min 10 : {changes_10min} %
                     min 30 : {changes_15min} %

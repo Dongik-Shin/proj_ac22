@@ -7,7 +7,7 @@ import slack
 class Slack():
 
     def __init__(self):
-        self.webhook_url = os.getenv("SLACK_WEBHOOK_URL", "https://hooks.slack.com/services/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")
+        self.webhook_url = os.getenv("SLACK_WEBHOOK_URL", "https://hooks.slack.com/services/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")
 
     def post_to_slack(self, msg):
         """ 
@@ -21,7 +21,6 @@ class Slack():
         -------
         response_object : 결과 오브젝트 (dict)
         """
-
         msg = self.generate_post_form(msg)
 
         slack_data = json.dumps({"blocks": msg})
