@@ -64,7 +64,7 @@ def monitoring(ticker="KRW-BTC"):
                     """
                     slack_obj.post_to_slack(msg)
                     log_obj.write_log(msg)
-                    in_sudden_check += 0.1
+                    in_sudden_check += 0.05
 
                 if changes_1min < de_sudden_check:
                     msg = f"""
@@ -75,18 +75,14 @@ def monitoring(ticker="KRW-BTC"):
                     """
                     slack_obj.post_to_slack(msg)
                     log_obj.write_log(msg)
-                    de_sudden_check -= 0.1
+                    de_sudden_check -= 0.05
 
             # report_term 간격으로 보고
             if cal_time_changes(flag_time) > report_term:
 
                 changes_15min = upbit_obj.get_min_changes(15)
                 time.sleep(0.15)
-                changes_30min = upbit_obj.get_min_changes(30)
-                time.sleep(0.15)
                 changes_1hour = upbit_obj.get_hour_changes(1)
-                time.sleep(0.15)
-                changes_3hour = upbit_obj.get_hour_changes(3)
                 time.sleep(0.15)
                 changes_6hour = upbit_obj.get_hour_changes(6)
                 time.sleep(0.15)
