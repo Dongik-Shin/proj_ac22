@@ -123,15 +123,19 @@ class Upbit():
         f_close : 특정 시간의 가격 (float)
         """
 
-        try:
-            df = pyupbit.get_ohlcv(
-                self.ticker, interval="minute1", count=target_min + 1)
+        # 총 3회 시도
+        for i in range(0, 3):
+            try:
+                df = pyupbit.get_ohlcv(
+                    self.ticker, interval="minute1", count=target_min + 1)
 
-            f_close = df['close'][0]
-            return f_close
+                f_close = df['close'][0]
+                return f_close
 
-        except Exception as ex:
-            return None
+            except Exception as ex:
+                pass
+
+        return None
 
     def get_target_hour_price(self, target_hour):
         """ 
@@ -146,15 +150,19 @@ class Upbit():
         f_close : 특정 시간의 가격 (float)
         """
 
-        try:
-            df = pyupbit.get_ohlcv(
-                self.ticker, interval="minute60", count=target_hour + 1)
+        # 총 3회 시도
+        for i in range(0, 3):
+            try:
+                df = pyupbit.get_ohlcv(
+                    self.ticker, interval="minute60", count=target_hour + 1)
 
-            f_close = df['close'][0]
-            return f_close
+                f_close = df['close'][0]
+                return f_close
 
-        except Exception as ex:
-            return None
+            except Exception as ex:
+                pass
+
+        return None
 
     def get_min_changes(self, target_min):
         """ 
@@ -323,7 +331,7 @@ class Upbit():
         """
 
         try:
-            krw_my_balance = get_my_balance("KRW")
+            krw_my_balance = self.get_my_balance("KRW")
 
             if krw_order < krw_my_balance:
                 response_object = {
@@ -366,7 +374,7 @@ class Upbit():
         """
         try:
             self.ticker = self.ticker.replace("KRW-", "")
-            ticker_balance = get_my_balance()
+            ticker_balance = self.get_my_balance()
 
             sell_result = self.upbit.sell_market_order(
                 self.ticker, ticker_balance)
@@ -399,3 +407,37 @@ class Upbit():
                 "message": str(ex)
             }
             return response_object
+
+    def get_target_hour_avg_price(self, target_hour, count=10):
+        """ 
+        def description : 타겟 시간 전 평균 가 산출 
+
+        Parameters
+        ----------
+        target_hour : 타겟 시간
+        count : 분단위 데이터 갯수
+
+        Returns
+        -------
+        avg_close : 평균 종가
+        """
+
+        # 총 50회 시도
+        for i in range(0, 50):
+            target_min = int(target_hour * 60 + (count/2))
+
+            try:
+                df = pyupbit.get_ohlcv(
+                    self.ticker, interval="minute1", count=target_min + 1)
+
+                sum_close = 0
+                for j in range(0, 10):
+                    sum_close += df['close'][j]
+
+                avg_close = sum_close / count
+                return avg_close
+
+            except Exception as ex:
+                pass
+
+        return None

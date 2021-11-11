@@ -44,6 +44,7 @@ def monitoring(ticker="KRW-SOL"):
 
             # 현재가 산출
             current_price = upbit_obj.get_current_price()
+            current_price = format(current_price, ",")
             print(f"{ticker} : {current_price}")
             time.sleep(0.15)
 
@@ -80,31 +81,58 @@ def monitoring(ticker="KRW-SOL"):
             # report_term 간격으로 보고
             if cal_time_changes(flag_time) > report_term:
 
-                changes_15min = upbit_obj.get_min_changes(15)
+                hour_before_price_1 = upbit_obj.get_target_hour_avg_price(1)
+                if hour_before_price_1:
+                    hour_before_price_1 = format(hour_before_price_1, ",")
                 time.sleep(0.15)
-                changes_1hour = upbit_obj.get_hour_changes(1)
+
+                hour_before_price_2 = upbit_obj.get_target_hour_avg_price(2)
+                if hour_before_price_2:
+                    hour_before_price_2 = format(hour_before_price_2, ",")
                 time.sleep(0.15)
-                changes_6hour = upbit_obj.get_hour_changes(6)
+
+                hour_before_price_3 = upbit_obj.get_target_hour_avg_price(3)
+                if hour_before_price_3:
+                    hour_before_price_3 = format(hour_before_price_3, ",")
                 time.sleep(0.15)
-                changes_12hour = upbit_obj.get_hour_changes(12)
+
+                hour_before_price_6 = upbit_obj.get_target_hour_avg_price(6)
+                if hour_before_price_6:
+                    hour_before_price_6 = format(hour_before_price_6, ",")
                 time.sleep(0.15)
-                changes_1day = upbit_obj.get_hour_changes(24)
+
+                hour_before_price_12 = upbit_obj.get_target_hour_avg_price(12)
+                if hour_before_price_12:
+                    hour_before_price_12 = format(hour_before_price_12, ",")
                 time.sleep(0.15)
-                changes_2day = upbit_obj.get_hour_changes(48)
+
+                day_before_price_1 = upbit_obj.get_target_hour_avg_price(24)
+                if day_before_price_1:
+                    day_before_price_1 = format(day_before_price_1, ",")
                 time.sleep(0.15)
-                changes_3day = upbit_obj.get_hour_changes(72)
+
+                day_before_price_2 = upbit_obj.get_target_hour_avg_price(48)
+                if day_before_price_2:
+                    day_before_price_2 = format(day_before_price_2, ",")
+                time.sleep(0.15)
+
+                day_before_price_3 = upbit_obj.get_target_hour_avg_price(72)
+                if day_before_price_3:
+                    day_before_price_3 = format(day_before_price_3, ",")
+                time.sleep(0.15)
 
                 msg = f"""
                     ticker : {ticker}
                     current_price : {current_price}
                     --------------------------
-                    min 15: {changes_15min} %
-                    hour 1 : {changes_1hour} %
-                    hour 6 : {changes_6hour} %  
-                    hour 12 : {changes_12hour} %    
-                    1day : {changes_1day} %       
-                    2day : {changes_2day} %       
-                    3day : {changes_3day} %       
+                    1 hour before : {hour_before_price_1} 
+                    2 hour before : {hour_before_price_2} 
+                    3 hour before : {hour_before_price_3} 
+                    6 hour before : {hour_before_price_6} 
+                    12 hour before : {hour_before_price_12} 
+                    1 day before : {day_before_price_1} 
+                    2 day before : {day_before_price_2} 
+                    3 day before : {day_before_price_3} 
                 """
                 slack_obj.post_to_slack(msg)
                 log_obj.write_log(msg)
