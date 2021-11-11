@@ -1,10 +1,12 @@
 import os
 import logging
-
 import pymysql
 import pyupbit
 
 from common.function.common_function import *
+
+# from dotenv import load_dotenv
+# load_dotenv()
 
 
 class Config:
@@ -27,11 +29,11 @@ class Config:
     def set_mysql(self):
 
         mysql_db = pymysql.connect(
-            user=os.getenv("DB_USER", "root"),
-            passwd=os.getenv("DB_PASSWROD", "localhost"),
-            host=os.getenv("DB_HOST", "127.0.0.1"),
+            user=os.getenv("DB_USER"),
+            passwd=os.getenv("DB_PASSWROD"),
+            host=os.getenv("DB_HOST"),
             port=3306,
-            db=os.getenv("DB_DATABASE", "ac22"),
+            db=os.getenv("DB_DATABASE"),
             charset='utf8'
         )
 

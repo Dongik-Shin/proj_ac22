@@ -1,14 +1,15 @@
 import os
 import json
 import requests
-import slack
+from dotenv import load_dotenv
+load_dotenv()
 
 
 class Slack():
 
     def __init__(self):
         self.webhook_url = os.getenv(
-            "SLACK_WEBHOOK_URL", "https://hooks.slack.com/services/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")
+            "SLACK_WEBHOOK_URL")
 
     def post_to_slack(self, msg):
         """ 

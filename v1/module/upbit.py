@@ -1,4 +1,4 @@
-from time import time
+import time
 import pyupbit
 
 from config.config import Config
