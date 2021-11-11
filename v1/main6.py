@@ -7,4 +7,4 @@ if __name__ == "__main__":
     upbit_obj = Upbit()
 
     upbit_obj.set_ticker("")
-    upbit_obj.buy_coin(500000)
+    upbit_obj.sell_coin()

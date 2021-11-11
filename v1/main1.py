@@ -1,4 +1,4 @@
-from service.KRW_AXS import *
+from service.KRW_BTC import *
 
 
 if __name__ == "__main__":

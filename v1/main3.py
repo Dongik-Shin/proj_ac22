@@ -1,4 +1,4 @@
-from service.KRW_ATOM import *
+from service.KRW_SOL import *
 
 
 if __name__ == "__main__":

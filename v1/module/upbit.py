@@ -1,3 +1,4 @@
+from time import time
 import pyupbit
 
 from config.config import Config
@@ -159,6 +160,7 @@ class Upbit():
         """ 
         def description : 현재시간 기준으로 타겟으로부터 분당 변화율 조회 
 
+
         Parameters
         ----------
         target_min : 타겟 구간의 시작 점(min, int)
@@ -168,18 +170,23 @@ class Upbit():
         current_price : 현재변화율 (float)
         """
 
-        try:
-            df = pyupbit.get_ohlcv(
-                self.ticker, interval="minute1", count=target_min+1)
+        # 총 3회 시도
+        for i in range(0, 3):
+            try:
+                df = pyupbit.get_ohlcv(
+                    self.ticker, interval="minute1", count=target_min+1)
 
-            f_close = df['close'][0]
-            l_close = df['close'][-1]
-            change_rate = ((l_close - f_close) / f_close) * 100
-            change_rate = round(change_rate, 4)
-            return change_rate
+                f_close = df['close'][0]
+                l_close = df['close'][-1]
+                change_rate = ((l_close - f_close) / f_close) * 100
+                change_rate = round(change_rate, 4)
+                return change_rate
 
-        except Exception as ex:
-            return None
+            except Exception as ex:
+                time.sleep(0.25)
+                pass
+
+        return None
 
     def get_hour_changes(self, target_hour):
         """ 

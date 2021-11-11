@@ -7,7 +7,8 @@ import slack
 class Slack():
 
     def __init__(self):
-        self.webhook_url = os.getenv("SLACK_WEBHOOK_URL", "https://hooks.slack.com/services/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")
+        self.webhook_url = os.getenv(
+            "SLACK_WEBHOOK_URL", "https://hooks.slack.com/services/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")
 
     def post_to_slack(self, msg):
         """ 

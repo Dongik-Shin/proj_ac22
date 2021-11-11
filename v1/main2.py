@@ -1,4 +1,4 @@
-from service.KRW_OMG import *
+from service.KRW_ETH import *
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ from module.log import *
 from common.function.common_function import *
 
 
-def monitoring(ticker="KRW-SOL"):
+def monitoring(ticker="KRW-BTC"):
 
     # init
     upbit_obj = Upbit()
@@ -41,6 +41,7 @@ def monitoring(ticker="KRW-SOL"):
     while True:
         try:
             upbit_obj.set_ticker(ticker)
+
             # 현재가 산출
             current_price = upbit_obj.get_current_price()
             print(f"{ticker} : {current_price}")
