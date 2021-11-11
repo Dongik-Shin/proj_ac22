@@ -92,22 +92,23 @@ def monitoring(ticker="KRW-BTC"):
                 time.sleep(0.15)
                 changes_12hour = upbit_obj.get_hour_changes(12)
                 time.sleep(0.15)
-                changes_24hour = upbit_obj.get_hour_changes(24)
+                changes_1day = upbit_obj.get_hour_changes(24)
+                time.sleep(0.15)
+                changes_2day = upbit_obj.get_hour_changes(48)
+                time.sleep(0.15)
+                changes_3day = upbit_obj.get_hour_changes(72)
 
                 msg = f"""
                     ticker : {ticker}
                     current_price : {current_price}
                     --------------------------
                     min 15: {changes_15min} %
-                    min 30 : {changes_30min} %
-                    --------------------------
                     hour 1 : {changes_1hour} %
-                    hour 3 : {changes_3hour} % 
-                    --------------------------
                     hour 6 : {changes_6hour} %  
                     hour 12 : {changes_12hour} %    
-                    --------------------------
-                    hour 24 : {changes_24hour} %        
+                    1day : {changes_1day} %       
+                    2day : {changes_2day} %       
+                    3day : {changes_3day} %       
                 """
                 slack_obj.post_to_slack(msg)
                 log_obj.write_log(msg)
