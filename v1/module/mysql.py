@@ -65,6 +65,8 @@ class Mysql:
                 return response_object
 
         except Exception as ex:
+            self.conn.rollback()
+            self.conn.close()
             response_object = {
                 "status": "fail",
                 "message": str(ex)
@@ -72,7 +74,6 @@ class Mysql:
             return response_object
 
         finally:
-            self.conn.close()
             self.fetch_result = None
 
     def format_read_all(self):
@@ -132,6 +133,8 @@ class Mysql:
                 return response_object
 
         except Exception as ex:
+            self.conn.rollback()
+            self.conn.close()
             response_object = {
                 "status": "fail",
                 "message": str(ex)
@@ -139,11 +142,50 @@ class Mysql:
             return response_object
 
         finally:
-            self.conn.close()
             self.fetch_result = None
 
     def excute_query(self, query=None, query_bulk=None):
         """ 쿼리 실행
+
+        Parameters : 
+        query : 쿼리문 단일(str)
+        query_bulk : 쿼리문 배열(list)
+
+        Returns
+        -------
+        response_object(dict) : 결과 오브젝트 
+        """
+
+        try:
+
+            if query or query_bulk:
+
+                # 단일 케이스
+                if query:
+                    self.cursor.execute(query)
+
+                # 복수 케이스
+                elif query_bulk:
+                    for query in query_bulk:
+                        self.cursor.execute(query)
+
+            response_object = {
+                "status": "success",
+                "message": "success"
+            }
+            return response_object
+
+        except Exception as ex:
+            self.conn.rollback()
+            self.conn.close()
+            response_object = {
+                "status": "fail",
+                "message": str(ex)
+            }
+            return response_object
+
+    def excute_query_with_commit(self, query=None, query_bulk=None):
+        """ 쿼리 실행 (커밋 포함)
 
         Parameters : 
         query : 쿼리문 단일(str)
@@ -185,11 +227,53 @@ class Mysql:
 
         except Exception as ex:
             self.conn.rollback()
+            self.conn.close()
             response_object = {
                 "status": "fail",
                 "message": str(ex)
             }
             return response_object
 
-        finally:
+    def commit(self):
+        """ 커밋 (호출용)
+
+        Returns
+        -------
+        result : 결과 (boolean)
+        """
+
+        try:
+            self.conn.commit()
+            return True
+
+        except Exception as ex:
+            return False
+
+    def roll_back(self):
+        """ 롤백 (호출용)
+
+        Returns
+        -------
+        result : 결과 (boolean)
+        """
+
+        try:
+            self.conn.rollback()
+            return True
+
+        except Exception as ex:
+            return False
+
+    def close_conn(self):
+        """ 커넥션 종료 (호출용)
+        Returns
+        -------
+        result : 결과 (boolean)
+        """
+
+        try:
             self.conn.close()
+            return True
+
+        except Exception as ex:
+            return False
