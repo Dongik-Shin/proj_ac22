@@ -57,6 +57,12 @@ class Upbit():
                 break
 
         return my_target_balance
+    
+    def get_krw_balance(self):
+
+        krw_balances = self.upbit.get_balances()
+        krw_balances = float(krw_balances[0]["balance"])
+        return krw_balances
 
     def get_all_my_balance(self):
         """ 
@@ -331,9 +337,9 @@ class Upbit():
         """
 
         try:
-            krw_my_balance = self.get_my_balance("KRW")
+            krw_my_balance = self.get_krw_balance()
 
-            if krw_order < krw_my_balance:
+            if krw_order > krw_my_balance:
                 response_object = {
                     "status": "fail",
                     "message": "not enough krw balance"
@@ -375,6 +381,7 @@ class Upbit():
         try:
             self.ticker = self.ticker.replace("KRW-", "")
             ticker_balance = self.get_my_balance()
+            print(ticker_balance)
 
             sell_result = self.upbit.sell_market_order(
                 self.ticker, ticker_balance)
@@ -422,8 +429,8 @@ class Upbit():
         avg_close : 평균 종가
         """
 
-        # 총 50회 시도
-        for i in range(0, 50):
+        # 총 10회 시도
+        for i in range(0, 10):
             target_min = int(target_hour * 60 + (count/2))
 
             try:
@@ -431,7 +438,42 @@ class Upbit():
                     self.ticker, interval="minute1", count=target_min + 1)
 
                 sum_close = 0
-                for j in range(0, 10):
+                for j in range(0, count):
+                    sum_close += df['close'][j]
+
+                avg_close = sum_close / count
+                return avg_close
+
+            except Exception as ex:
+                pass
+
+        return None
+
+
+    def get_target_day_avg_price(self, target_day, count=4):
+        """ 
+        def description : 타겟 일 전 평균 가 산출 
+
+        Parameters
+        ----------
+        target_hour : 타겟 시간
+        count : 분단위 데이터 갯수
+
+        Returns
+        -------
+        avg_close : 평균 종가
+        """
+
+        # 총 10회 시도
+        for i in range(0, 10):
+            target_hour = int(target_day * 24 + (count/2))
+
+            try:
+                df = pyupbit.get_ohlcv(
+                    self.ticker, interval="minute60", count=target_hour+1)
+
+                sum_close = 0
+                for j in range(0, count):
                     sum_close += df['close'][j]
 
                 avg_close = sum_close / count

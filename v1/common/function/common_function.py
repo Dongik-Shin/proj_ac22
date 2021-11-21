@@ -112,3 +112,8 @@ def cal_time_changes(flag_time):
     now_time = time.time()
     time_diff = (now_time - flag_time)
     return time_diff
+
+def cal_price_changes(f_close, l_close):
+
+    change_rate = round(((l_close - f_close) / f_close) * 100, 3)
+    return change_rate

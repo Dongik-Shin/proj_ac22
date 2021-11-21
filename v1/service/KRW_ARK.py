@@ -9,7 +9,7 @@ from module.log import *
 from common.function.common_function import *
 
 
-def monitoring(ticker="KRW-ETH"):
+def monitoring(ticker="KRW-ARK"):
 
     # init
     upbit_obj = Upbit()
@@ -18,8 +18,8 @@ def monitoring(ticker="KRW-ETH"):
     log_obj = Log()
 
     flag_time = time.time()  # 시간 체커
-    report_term = 1800        # 리포트 텀(sec)
-    org_de_sudden_check = -0.4
+    report_term = 3600        # 리포트 텀(sec)
+    org_de_sudden_check = -0.5
     org_in_sudden_check = abs(org_de_sudden_check)
     de_sudden_check = org_de_sudden_check
     in_sudden_check = org_in_sudden_check
@@ -53,9 +53,7 @@ started at : {datetime.datetime.now()}
 
             # sudden in/de crease check
             if changes_1min:
-
                 if changes_1min > in_sudden_check:
-
                     msg = f"""
 ticker : {ticker}
 sudden increase   
