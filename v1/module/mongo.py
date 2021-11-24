@@ -14,7 +14,7 @@ class Mongo:
         self.doc = None
 
     def get_col_list(self):
-        """ 컬렉션 리스트 리턴
+        """ def description : 컬렉션 리스트 리턴
 
         Returns
         -------
@@ -23,7 +23,7 @@ class Mongo:
         return self.db.collection_names()
 
     def set_col(self, col):
-        """ 컬렉션 셋팅
+        """ def description : 컬렉션 셋팅
 
         Parameters : 
         col : 컬렉션(str) 
@@ -36,7 +36,7 @@ class Mongo:
         return self.col
 
     def is_col(self):
-        """ 컬렉션이 정상 셋팅 되었는지 확인
+        """ def description : 컬렉션이 정상 셋팅 되었는지 확인
 
         Returns
         -------
@@ -49,7 +49,7 @@ class Mongo:
         return False
 
     def insert_doc(self, post):
-        """ 다큐먼트 삽입
+        """ def description : 다큐먼트 삽입
 
         Parameters : 
         post : json 데이터 (dict) 
@@ -65,7 +65,7 @@ class Mongo:
         return self.inserted_id
 
     def get_doc_one(self):
-        """ 다큐먼트 단일 조회
+        """ def description : 다큐먼트 단일 조회
 
         Returns
         -------
@@ -79,7 +79,7 @@ class Mongo:
         return self.doc
 
     def get_doc(self, limit):
-        """ 다큐먼트 복수 조회
+        """ def description : 다큐먼트 복수 조회
 
         Returns
         -------

@@ -13,7 +13,7 @@ class Mysql:
         self.fetch_result = None
 
     def format_read_one(self):
-        """ read_one 포멧팅
+        """ def description : read_one 포멧팅
 
         Returns
         -------
@@ -27,7 +27,7 @@ class Mysql:
         return row_dict
 
     def read_one(self, query, bind=None):
-        """ 데이터 단일 조회 
+        """ def description : 데이터 단일 조회 
 
         Parameters : 
         query: 쿼리문(str) 
@@ -77,7 +77,7 @@ class Mysql:
             self.fetch_result = None
 
     def format_read_all(self):
-        """ read_all 포멧팅
+        """ def description : read_all 포멧팅
 
         Returns
         -------
@@ -96,7 +96,7 @@ class Mysql:
         return row_list
 
     def read_all(self, query, bind=None):
-        """ 데이터 복수 조회 
+        """ def description : 데이터 복수 조회 
 
         Parameters : 
         query : 쿼리문(str) 
@@ -145,7 +145,7 @@ class Mysql:
             self.fetch_result = None
 
     def excute_query(self, query=None, query_bulk=None):
-        """ 쿼리 실행
+        """ def description : 쿼리 실행
 
         Parameters : 
         query : 쿼리문 단일(str)
@@ -185,7 +185,7 @@ class Mysql:
             return response_object
 
     def excute_query_with_commit(self, query=None, query_bulk=None):
-        """ 쿼리 실행 (커밋 포함)
+        """ def description : 쿼리 실행 (커밋 포함)
 
         Parameters : 
         query : 쿼리문 단일(str)
@@ -235,7 +235,7 @@ class Mysql:
             return response_object
 
     def commit(self):
-        """ 커밋 (호출용)
+        """ def description : 커밋 (호출용)
 
         Returns
         -------
@@ -250,7 +250,7 @@ class Mysql:
             return False
 
     def roll_back(self):
-        """ 롤백 (호출용)
+        """ def description : 롤백 (호출용)
 
         Returns
         -------
@@ -265,7 +265,8 @@ class Mysql:
             return False
 
     def close_conn(self):
-        """ 커넥션 종료 (호출용)
+        """ def description : 커넥션 종료 (호출용)
+
         Returns
         -------
         result : 결과 (boolean)
