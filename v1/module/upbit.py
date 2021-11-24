@@ -57,7 +57,7 @@ class Upbit():
                 break
 
         return my_target_balance
-    
+
     def get_krw_balance(self):
 
         krw_balances = self.upbit.get_balances()
@@ -265,6 +265,29 @@ class Upbit():
 
         return ma
 
+    def get_cross_state(self):
+        """ 
+        def description : 크로스 상태 조회
+
+        Returns
+        -------
+        state : 크로스 상태 (str)
+        """
+        state = None
+        if self.is_super_golden_crossed():
+            state = "SGC"
+
+        elif self.is_golden_crossed():
+            state = "GC"
+
+        elif self.is_super_dead_crossed():
+            state = "SDC"
+
+        elif self.is_dead_crossed():
+            state = "DC"
+
+        return state
+
     def is_golden_crossed(self):
         """ 
         def description : 골든 크로스 상태인지 확인
@@ -448,7 +471,6 @@ class Upbit():
                 pass
 
         return None
-
 
     def get_target_day_avg_price(self, target_day, count=4):
         """ 

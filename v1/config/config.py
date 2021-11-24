@@ -1,6 +1,7 @@
 import os
 import logging
 import pymysql
+import pymongo
 import pyupbit
 
 from common.function.common_function import *
@@ -14,6 +15,7 @@ class Config:
     def __init__(self):
         self.logger = None
         self.mysql_db = None
+        self.mongo_db = None
         self.upbit = None
 
     def set_log(self):
@@ -29,17 +31,25 @@ class Config:
     def set_mysql(self):
 
         mysql_db = pymysql.connect(
-            user=os.getenv("DB_USER"),
-            passwd=os.getenv("DB_PASSWROD"),
-            host=os.getenv("DB_HOST"),
+            user=os.getenv("MYSQL_DB_USER"),
+            passwd=os.getenv("MYSQL_DB_PASSWROD"),
+            host=os.getenv("MYSQL_DB_HOST"),
             port=3306,
-            db=os.getenv("DB_DATABASE"),
+            db=os.getenv("MYSQL_DB_DATABASE"),
             charset='utf8'
         )
 
         self.mysql_db = mysql_db
 
         return self.mysql_db
+
+    def set_mongo(self):
+
+        self.mongo_db = pymongo.MongoClient(
+            host=os.getenv("MONGO_HOST"),
+            port=27017
+        )
+        return self.mongo_db
 
     def set_upbit(self):
 
