@@ -57,20 +57,15 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
     # 서든 체커
     SUDDEN_MIN = sudden_term                # 서든 기준 텀 (min)
     SUDDEN_SEC = sudden_term * 60           # 서든 기준 텀 (sec)
-
     sudden_checker_init_term = 900          # 서든 체커 초기화 텀
+
     org_in_sudden_check = sudden_per        # 원본 인크리즈 체커 퍼센티지
     org_de_sudden_check = -(sudden_per)     # 원본 디크리즈 체커 퍼센티지
-
     in_sudden_check = org_in_sudden_check   # 인크리즈 체커
     de_sudden_check = org_de_sudden_check   # 디크리즈 체커
 
-    # loop
-    loop_cnt = 0
-
     while True:
         try:
-            loop_cnt += 1
 
             upbit.set_ticker(ticker)
 
@@ -80,14 +75,8 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
             time.sleep(0.15)
 
             # sudden in/de crease check by sudden_time
-            if loop_cnt > SUDDEN_SEC:
-                data_list = mongo.get_doc(SUDDEN_SEC)
-                data_list[0]["current_price"]
-                data_list[-1]["current_price"]
-                changes_5min = cal_price_changes(data_list[0]["current_price"], data_list[-1]["current_price"])
-
-            else:
-                changes_5min = upbit.get_min_changes(SUDDEN_MIN)
+            changes_5min = upbit.get_min_changes(SUDDEN_MIN)
+            print(f"{changes_5min}, by api")
 
             time.sleep(0.15)
 
@@ -135,7 +124,6 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
             #     pass
 
         except Exception as ex:
-            loop_cnt = 0
             log.write_log(str(ex))
             log.write_log("=====================")
             time.sleep(3)
