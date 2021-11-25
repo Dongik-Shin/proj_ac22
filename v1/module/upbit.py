@@ -260,10 +260,19 @@ class Upbit():
 
         - .iloc[-1] - 마지막 항목 추출
         """
-        df = pyupbit.get_ohlcv(self.ticker, interval="day", count=target_term)
-        ma = df['close'].rolling(target_term).mean().iloc[-1]
+        # 총 3회 시도
+        for i in range(0, 3):
+            try:
+                df = pyupbit.get_ohlcv(self.ticker, interval="day", count=target_term)
+                ma = df['close'].rolling(target_term).mean().iloc[-1]
+                time.sleep(0.15)
+                return ma
 
-        return ma
+            except Exception as ex:
+                time.sleep(0.25)
+                pass
+
+
 
     def get_cross_state(self):
         """ 

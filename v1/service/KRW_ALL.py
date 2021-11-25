@@ -64,21 +64,19 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
     in_sudden_check = org_in_sudden_check   # 인크리즈 체커
     de_sudden_check = org_de_sudden_check   # 디크리즈 체커
 
+    upbit.set_ticker(ticker)
+
+
+    loop_cnt = 0 
     while True:
         try:
-
-            upbit.set_ticker(ticker)
 
             # 현재가 산출
             current_price = upbit.get_current_price()
             print(f"{ticker} : {format(current_price, ',')}")
-            time.sleep(0.15)
 
             # sudden in/de crease check by sudden_time
             changes_5min = upbit.get_min_changes(SUDDEN_MIN)
-            print(f"{changes_5min}, by api")
-
-            time.sleep(0.15)
 
             # sudden in/de crease check
             if changes_5min:
@@ -102,12 +100,14 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
 
             # cross_state 변화 체크
             cross_state = upbit.get_cross_state()
-            prev_cross_state = mongo.get_doc_one()["cross_state"]
 
-            if prev_cross_state != cross_state:
-                msg = f"ticker : {ticker}, cross changed, cross_state : {cross_state}, current_price : {current_price}"
-                slack.post_to_slack(msg)
-                log.write_log(msg)
+            if cross_state:
+                if loop_cnt != 0 :
+                    prev_cross_state = mongo.get_doc_one()["cross_state"]
+                    if prev_cross_state != cross_state:
+                        msg = f"ticker : {ticker}, cross changed, cross_state : {cross_state}, current_price : {current_price}"
+                        slack.post_to_slack(msg)
+                        log.write_log(msg)
 
             # 신규데이터 삽입
             post = {
@@ -117,7 +117,6 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
                 "date": datetime.datetime.now()
             }
             mongo.insert_doc(post)
-            time.sleep(0.7)
 
             # report_term 간격으로 보고
             # if cal_time_changes(flag_time) > report_term:

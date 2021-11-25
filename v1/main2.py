@@ -7,5 +7,5 @@ if __name__ == "__main__":
         ticker="KRW-ETH",
         report_term=21600,
         sudden_term=5,
-        sudden_per=0.8
+        sudden_per=1
     )
