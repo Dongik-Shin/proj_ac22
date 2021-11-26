@@ -113,7 +113,40 @@ def cal_time_changes(flag_time):
     time_diff = (now_time - flag_time)
     return time_diff
 
-def cal_price_changes(f_close, l_close):
 
+def cal_price_changes(f_close, l_close):
+    """ 
+    def description : 가격 변화 산출 
+
+    Parameters
+    ----------
+    f_close : 시가
+    l_close : 종가
+
+    Returns
+    -------
+    change_rate : 변화율
+    """
     change_rate = round(((l_close - f_close) / f_close) * 100, 3)
     return change_rate
+
+
+def sort_by_current_price(data_list):
+    """ 
+    def description : 현재가 기준으로 정렬 
+
+    Parameters
+    ----------
+    data_list : 데이터 리스트 (list)
+
+    Returns
+    -------
+    data_list : 데이터 리스트 (list)
+    """
+    arr = data_list
+    for i in range(len(arr) - 1, 0, -1):
+        for j in range(i):
+            if arr[j]["current_price"] < arr[j + 1]["current_price"]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+
+    return data_list

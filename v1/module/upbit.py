@@ -59,6 +59,13 @@ class Upbit():
         return my_target_balance
 
     def get_krw_balance(self):
+        """ 
+        def description : 원화 잔고 조회
+
+        Returns
+        -------
+        krw_balances : 원화
+        """
 
         krw_balances = self.upbit.get_balances()
         krw_balances = float(krw_balances[0]["balance"])
@@ -263,7 +270,8 @@ class Upbit():
         # 총 3회 시도
         for i in range(0, 3):
             try:
-                df = pyupbit.get_ohlcv(self.ticker, interval="day", count=target_term)
+                df = pyupbit.get_ohlcv(
+                    self.ticker, interval="day", count=target_term)
                 ma = df['close'].rolling(target_term).mean().iloc[-1]
                 time.sleep(0.15)
                 return ma
@@ -271,8 +279,6 @@ class Upbit():
             except Exception as ex:
                 time.sleep(0.25)
                 pass
-
-
 
     def get_cross_state(self):
         """ 

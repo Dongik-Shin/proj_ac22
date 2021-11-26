@@ -1,3 +1,4 @@
+import json
 import time
 import datetime
 
@@ -10,10 +11,86 @@ from module.log import *
 from common.function.common_function import *
 
 
+def cross_state_for_all_KRW():
+    """
+    def description : 모든 원화 상장 코인들의 cross state 출력
+    """
+
+    upbit = Upbit()
+    log = Log()
+
+    # log 생성
+    log.create_log(
+        f"{os.path.abspath(os.curdir)}/log/{str(generate_now_day())}")
+
+    KRW_tickers = upbit.get_KRW_tickers()
+
+    SGC_list = []
+    GC_list = []
+    SDC_list = []
+    DC_list = []
+    for ticker in KRW_tickers:
+
+        upbit.set_ticker(ticker)
+
+        # get_cross_state
+        current_price = upbit.get_current_price()
+        cross_state = upbit.get_cross_state()
+
+        if cross_state == "SGC":
+            data_dict = {
+                "ticker": ticker,
+                "current_price": current_price,
+                "cross_state": cross_state
+            }
+            SGC_list.append(data_dict)
+
+        elif cross_state == "GC":
+            data_dict = {
+                "ticker": ticker,
+                "current_price": current_price,
+                "cross_state": cross_state
+            }
+            GC_list.append(data_dict)
+
+        elif cross_state == "SDC":
+            data_dict = {
+                "ticker": ticker,
+                "current_price": current_price,
+                "cross_state": cross_state
+            }
+            SDC_list.append(data_dict)
+
+        elif cross_state == "DC":
+            data_dict = {
+                "ticker": ticker,
+                "current_price": current_price,
+                "cross_state": cross_state
+            }
+            DC_list.append(data_dict)
+
+    # 현재가 기준으로 sorting
+    SGC_list = sort_by_current_price(SGC_list)
+    GC_list = sort_by_current_price(GC_list)
+    SDC_list = sort_by_current_price(SDC_list)
+    DC_list = sort_by_current_price(DC_list)
+
+    # 출력
+    log.write_log("super golden crossed list")
+    log.write_log(json.dumps(SGC_list, indent=4))
+    log.write_log("golden crossed list")
+    log.write_log(json.dumps(GC_list, indent=4))
+    log.write_log("super dead crossed list")
+    log.write_log(json.dumps(SDC_list, indent=4))
+    log.write_log("dead crossed list")
+    log.write_log(json.dumps(DC_list, indent=4))
+    return
+
+
 def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, sudden_init_term=15):
     """
 
-    def description : 모니터링 
+    def description : 모니터링
 
     Parameters
     ----------
@@ -72,7 +149,7 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
             current_price = upbit.get_current_price()
             print(f"{ticker} : {format(current_price, ',')}")
 
-            # sudden in/de crease check by sudden_time
+            # sudden in/de crease check by sudden_term
             changes_5min = upbit.get_min_changes(sudden_term)
 
             # sudden in/de crease check
@@ -89,7 +166,7 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
                     log.write_log(msg)
                     de_sudden_check -= 0.05
 
-            # 일정 간격으로 서든 값 초기화
+            # 주기별 서든 값 초기화
             if cal_time_changes(flag_time) > sudden_init_term:
                 de_sudden_check = org_de_sudden_check
                 in_sudden_check = org_in_sudden_check
@@ -123,33 +200,6 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
             log.write_log(str(ex))
             log.write_log("=====================")
             time.sleep(3)
-
-
-def insert_ticker_info(ticker):
-    """
-    def description : 몽고DB에 티커 정보 저장  
-    크론으로 실행하여 일정 주기로 티커정보 저장
-
-    Parameters
-    ----------
-    ticker : 티커 (string)
-
-    """
-    mongo = Mongo()
-    upbit = Upbit()
-
-    upbit.set_ticker(ticker)
-
-    current_price = upbit.get_current_price()
-    cross_state = upbit.get_cross_state()
-
-    post = {
-        "ticker": ticker,
-        "current_price": current_price,
-        "cross_state": cross_state,
-        "date": datetime.datetime.now()
-    }
-    mongo.insert_doc(post)
 
 
 def catch_krw_new_public():
@@ -197,11 +247,6 @@ def catch_krw_new_public():
                 diff_ticker_cnt = len(diff_ticker)
                 if diff_ticker_cnt > 0:
                     if new_cnt > old_cnt:
-
-                        # 매수 시도 시간 갱신
-                        if try_flag == False:
-                            buy_time = time.time()
-
                         # 매수 시도
                         new_ticker = list(diff_ticker)[0]
                         upbit.set_ticker(new_ticker)
@@ -210,13 +255,25 @@ def catch_krw_new_public():
                             balance_status == "buy"
                             msg = f"new_ticker : {new_ticker}, buying success"
                             slack.post_to_slack(msg)
+                            slack.post_to_slack(msg)
+                            slack.post_to_slack(msg)
+                            slack.post_to_slack(msg)
+                            slack.post_to_slack(msg)
                             log.write_log(msg)
 
                         # 매수 실패
                         else:
                             msg = f"new_ticker : {new_ticker}, buying fail"
                             slack.post_to_slack(msg)
+                            slack.post_to_slack(msg)
+                            slack.post_to_slack(msg)
+                            slack.post_to_slack(msg)
+                            slack.post_to_slack(msg)
                             log.write_log(msg)
+
+                        # 매수 시도 시간 갱신
+                        if try_flag == False:
+                            buy_time = time.time()
 
                         try_flag = True
 

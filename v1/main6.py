@@ -1,9 +1,6 @@
+from service.KRW_ALL import *
 
-from module.upbit import *
 
 if __name__ == "__main__":
 
-    # init
-    upbit_obj = Upbit()
-    upbit_obj.set_ticker("KRW-ARK")
-    upbit_obj.sell_coin()
+    cross_state_for_all_KRW()
