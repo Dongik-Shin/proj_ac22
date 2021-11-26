@@ -5,7 +5,8 @@ if __name__ == "__main__":
 
     monitoring(
         ticker="KRW-ARK",
-        report_term=21600,
+        report_term=720,
         sudden_term=5,
-        sudden_per=1
+        sudden_per=1,
+        sudden_init_term=15
     )

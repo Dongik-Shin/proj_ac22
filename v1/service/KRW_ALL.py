@@ -10,7 +10,7 @@ from module.log import *
 from common.function.common_function import *
 
 
-def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5):
+def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, sudden_init_term=15):
     """
 
     def description : 모니터링 
@@ -18,9 +18,10 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
     Parameters
     ----------
     ticker : 티커 (string)
-    report_term : 리포트 주기 (sec, int)
+    report_term : 리포트 주기 (min, int)
     sudden_term : 서든 기준 텀 (min, int)
     sudden_per :  서든 기준 퍼센티지 (percent, float)
+    sudden_init_term : 서든 상황 종료 후 서든 값 초기화 (min, int)
 
     Returns
     -------
@@ -39,7 +40,8 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
     slack.post_to_slack(msg_s)
 
     # log 생성
-    log.create_log(f"{os.path.abspath(os.curdir)}/log/{str(generate_now_day())}")
+    log.create_log(
+        f"{os.path.abspath(os.curdir)}/log/{str(generate_now_day())}")
     log.write_log(msg_s)
 
     # mongo DB 셋팅
@@ -51,14 +53,10 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
     mongo.set_col(ticker.replace("-", "_"))
 
     # 변수 셋팅
-    # 리포팅
-    flag_time = time.time()                 # 시간 체커
+    flag_time = time.time()                  # 시간 체커
+    report_term = report_term * 60           # min to sec
 
-    # 서든 체커
-    SUDDEN_MIN = sudden_term                # 서든 기준 텀 (min)
-    SUDDEN_SEC = sudden_term * 60           # 서든 기준 텀 (sec)
-    sudden_checker_init_term = 900          # 서든 체커 초기화 텀
-
+    sudden_init_term = sudden_init_term * 60  # min to sec
     org_in_sudden_check = sudden_per        # 원본 인크리즈 체커 퍼센티지
     org_de_sudden_check = -(sudden_per)     # 원본 디크리즈 체커 퍼센티지
     in_sudden_check = org_in_sudden_check   # 인크리즈 체커
@@ -66,8 +64,7 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
 
     upbit.set_ticker(ticker)
 
-
-    loop_cnt = 0 
+    loop_cnt = 0
     while True:
         try:
 
@@ -76,7 +73,7 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
             print(f"{ticker} : {format(current_price, ',')}")
 
             # sudden in/de crease check by sudden_time
-            changes_5min = upbit.get_min_changes(SUDDEN_MIN)
+            changes_5min = upbit.get_min_changes(sudden_term)
 
             # sudden in/de crease check
             if changes_5min:
@@ -93,7 +90,7 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
                     de_sudden_check -= 0.05
 
             # 일정 간격으로 서든 값 초기화
-            if cal_time_changes(flag_time) > sudden_checker_init_term:
+            if cal_time_changes(flag_time) > sudden_init_term:
                 de_sudden_check = org_de_sudden_check
                 in_sudden_check = org_in_sudden_check
                 flag_time = time.time()
@@ -102,7 +99,7 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
             cross_state = upbit.get_cross_state()
 
             if cross_state:
-                if loop_cnt != 0 :
+                if loop_cnt != 0:
                     prev_cross_state = mongo.get_doc_one()["cross_state"]
                     if prev_cross_state != cross_state:
                         msg = f"ticker : {ticker}, cross changed, cross_state : {cross_state}, current_price : {current_price}"
@@ -126,6 +123,33 @@ def monitoring(ticker="KRW-BTC", report_term=3600, sudden_term=5, sudden_per=0.5
             log.write_log(str(ex))
             log.write_log("=====================")
             time.sleep(3)
+
+
+def insert_ticker_info(ticker):
+    """
+    def description : 몽고DB에 티커 정보 저장  
+    크론으로 실행하여 일정 주기로 티커정보 저장
+
+    Parameters
+    ----------
+    ticker : 티커 (string)
+
+    """
+    mongo = Mongo()
+    upbit = Upbit()
+
+    upbit.set_ticker(ticker)
+
+    current_price = upbit.get_current_price()
+    cross_state = upbit.get_cross_state()
+
+    post = {
+        "ticker": ticker,
+        "current_price": current_price,
+        "cross_state": cross_state,
+        "date": datetime.datetime.now()
+    }
+    mongo.insert_doc(post)
 
 
 def catch_krw_new_public():
