@@ -337,7 +337,10 @@ def catch_krw_new_public():
             if cal_time_changes(flag_time) > report_term:    
                 KRW_tickers_old = upbit.get_KRW_tickers()
                 old_cnt = len(KRW_tickers_old)
-                flag_time = time.time()         
+                flag_time = time.time()        
+                
+                msg = f"no changes, time : {datetime.datetime.now()}"
+                log.write_log(msg) 
 
             time.sleep(0.05)
 
