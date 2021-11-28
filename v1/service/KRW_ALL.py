@@ -76,14 +76,14 @@ def cross_state_for_all_KRW():
     DC_list = sort_by_current_price(DC_list)
 
     # 출력
-    log.write_log("super golden crossed list")
-    log.write_log(json.dumps(SGC_list, indent=4))
     log.write_log("golden crossed list")
     log.write_log(json.dumps(GC_list, indent=4))
+    log.write_log("dead crossed list")    
+    log.write_log("super golden crossed list")
+    log.write_log(json.dumps(SGC_list, indent=4))
+    log.write_log(json.dumps(DC_list, indent=4))
     log.write_log("super dead crossed list")
     log.write_log(json.dumps(SDC_list, indent=4))
-    log.write_log("dead crossed list")
-    log.write_log(json.dumps(DC_list, indent=4))
     return
 
 
@@ -193,8 +193,42 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
             mongo.insert_doc(post)
 
             # report_term 간격으로 보고
-            # if cal_time_changes(flag_time) > report_term:
-            #     pass
+            if cal_time_changes(flag_time) > report_term:
+
+                hour_12_before_price = upbit.get_target_hour_avg_price(12)
+                if hour_12_before_price:
+                    hour_12_change_rate = cal_price_changes(hour_12_before_price, current_price)
+                    hour_12_before_price = format(hour_12_before_price, ",")
+                time.sleep(0.15)
+
+                day_1_before_price = upbit.get_target_day_avg_price(1)
+                if day_1_before_price:
+                    day_1_before_rate = cal_price_changes(day_1_before_price, current_price)
+                    day_1_before_price = format(day_1_before_price, ",")
+                time.sleep(0.15)
+
+                day_3_before_price = upbit.get_target_day_avg_price(3)
+                if day_3_before_price:
+                    day_3_before_rate = cal_price_changes(day_3_before_price, current_price)
+                    day_3_before_price = format(day_3_before_price, ",")
+                time.sleep(0.15)
+
+                day_7_before_price = upbit.get_target_day_avg_price(7)
+                if day_7_before_price:
+                    day_7_before_rate = cal_price_changes(day_7_before_price, current_price)
+                    day_7_before_price = format(day_7_before_price, ",")   
+
+                time.sleep(0.15)
+                msg = f"""
+                    ticker : {ticker}
+                    current_price : {current_price}
+                    hour_12_before_price: {hour_12_change_rate}, {hour_12_change_rate}%
+                    day_1_before_price: {day_1_before_price}, {day_1_before_rate}%
+                    day_3_before_price: {day_3_before_price}, {day_3_before_rate}%
+                    day_7_before_price: {day_7_before_price}, {day_7_before_rate}%
+                    """ 
+                time.sleep(0.15)
+                pass
 
         except Exception as ex:
             log.write_log(str(ex))
@@ -227,6 +261,8 @@ def catch_krw_new_public():
     buy_time = None
     try_flag = False
     balance_status = "keep"
+    flag_time = time.time()                  # 시간 체커
+    report_term = 86400
 
     # 기존 티커 리스트
     KRW_tickers_old = upbit.get_KRW_tickers()
@@ -247,6 +283,7 @@ def catch_krw_new_public():
                 diff_ticker_cnt = len(diff_ticker)
                 if diff_ticker_cnt > 0:
                     if new_cnt > old_cnt:
+                        
                         # 매수 시도
                         new_ticker = list(diff_ticker)[0]
                         upbit.set_ticker(new_ticker)
@@ -295,6 +332,12 @@ def catch_krw_new_public():
                         msg = f"new_ticker : {new_ticker}, selling fail"
                         slack.post_to_slack(msg)
                         log.write_log(msg)
+
+            # report_term 간격으로 변수 셋팅
+            if cal_time_changes(flag_time) > report_term:    
+                KRW_tickers_old = upbit.get_KRW_tickers()
+                old_cnt = len(KRW_tickers_old)
+                flag_time = time.time()         
 
             time.sleep(0.05)
 

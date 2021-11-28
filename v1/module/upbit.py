@@ -408,18 +408,25 @@ class Upbit():
             }
             return response_object
 
-    def sell_coin(self):
+    def sell_coin(self, krw_order=None):
         """ 
         def description : 코인 매도
+        krw_order : 코인 원화 주문 가격 
 
         Returns
         -------
         response_object : 결과 오브젝트(dict) 
         """
         try:
-            self.ticker = self.ticker.replace("KRW-", "")
-            ticker_balance = self.get_my_balance()
-            print(ticker_balance)
+            org_ticker = self.ticker
+
+            if krw_order:
+                ticker_balance = krw_order
+            
+            else: 
+                self.ticker = self.ticker.replace("KRW-", "")
+                ticker_balance = self.get_my_balance()
+                self.ticker = org_ticker
 
             sell_result = self.upbit.sell_market_order(
                 self.ticker, ticker_balance)
@@ -452,6 +459,7 @@ class Upbit():
                 "message": str(ex)
             }
             return response_object
+        
 
     def get_target_hour_avg_price(self, target_hour, count=10):
         """ 
