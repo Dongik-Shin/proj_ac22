@@ -78,10 +78,10 @@ def cross_state_for_all_KRW():
     # 출력
     log.write_log("golden crossed list")
     log.write_log(json.dumps(GC_list, indent=4))
-    log.write_log("dead crossed list")    
+    log.write_log("dead crossed list")
+    log.write_log(json.dumps(DC_list, indent=4))
     log.write_log("super golden crossed list")
     log.write_log(json.dumps(SGC_list, indent=4))
-    log.write_log(json.dumps(DC_list, indent=4))
     log.write_log("super dead crossed list")
     log.write_log(json.dumps(SDC_list, indent=4))
     return
@@ -197,26 +197,30 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
 
                 hour_12_before_price = upbit.get_target_hour_avg_price(12)
                 if hour_12_before_price:
-                    hour_12_change_rate = cal_price_changes(hour_12_before_price, current_price)
+                    hour_12_change_rate = cal_price_changes(
+                        hour_12_before_price, current_price)
                     hour_12_before_price = format(hour_12_before_price, ",")
                 time.sleep(0.15)
 
                 day_1_before_price = upbit.get_target_day_avg_price(1)
                 if day_1_before_price:
-                    day_1_before_rate = cal_price_changes(day_1_before_price, current_price)
+                    day_1_before_rate = cal_price_changes(
+                        day_1_before_price, current_price)
                     day_1_before_price = format(day_1_before_price, ",")
                 time.sleep(0.15)
 
                 day_3_before_price = upbit.get_target_day_avg_price(3)
                 if day_3_before_price:
-                    day_3_before_rate = cal_price_changes(day_3_before_price, current_price)
+                    day_3_before_rate = cal_price_changes(
+                        day_3_before_price, current_price)
                     day_3_before_price = format(day_3_before_price, ",")
                 time.sleep(0.15)
 
                 day_7_before_price = upbit.get_target_day_avg_price(7)
                 if day_7_before_price:
-                    day_7_before_rate = cal_price_changes(day_7_before_price, current_price)
-                    day_7_before_price = format(day_7_before_price, ",")   
+                    day_7_before_rate = cal_price_changes(
+                        day_7_before_price, current_price)
+                    day_7_before_price = format(day_7_before_price, ",")
 
                 time.sleep(0.15)
                 msg = f"""
@@ -226,7 +230,7 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
                     day_1_before_price: {day_1_before_price}, {day_1_before_rate}%
                     day_3_before_price: {day_3_before_price}, {day_3_before_rate}%
                     day_7_before_price: {day_7_before_price}, {day_7_before_rate}%
-                    """ 
+                    """
                 time.sleep(0.15)
                 pass
 
@@ -283,11 +287,11 @@ def catch_krw_new_public():
                 diff_ticker_cnt = len(diff_ticker)
                 if diff_ticker_cnt > 0:
                     if new_cnt > old_cnt:
-                        
+
                         # 매수 시도
                         new_ticker = list(diff_ticker)[0]
                         upbit.set_ticker(new_ticker)
-                        response = upbit.buy_coin(500000)
+                        response = upbit.buy_coin(300000)
                         if response["status"] == "success":
                             balance_status == "buy"
                             msg = f"new_ticker : {new_ticker}, buying success"
@@ -334,13 +338,13 @@ def catch_krw_new_public():
                         log.write_log(msg)
 
             # report_term 간격으로 변수 셋팅
-            if cal_time_changes(flag_time) > report_term:    
+            if cal_time_changes(flag_time) > report_term:
                 KRW_tickers_old = upbit.get_KRW_tickers()
                 old_cnt = len(KRW_tickers_old)
-                flag_time = time.time()        
-                
+                flag_time = time.time()
+
                 msg = f"no changes, time : {datetime.datetime.now()}"
-                log.write_log(msg) 
+                log.write_log(msg)
 
             time.sleep(0.05)
 
