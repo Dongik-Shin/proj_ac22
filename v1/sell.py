@@ -5,14 +5,8 @@ if __name__ == "__main__":
 
     # init
     upbit_obj = Upbit()
-    upbit_obj.set_ticker("KRW-HUM")
+    upbit_obj.set_ticker("KRW-ETH")
 
-
-
-    # buy
-    # response = upbit_obj.buy_coin(500000)
-    # print(response)
-
-    #sell
+    # sell
     response = upbit_obj.sell_coin()
     print(response)

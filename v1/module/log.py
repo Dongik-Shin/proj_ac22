@@ -39,7 +39,7 @@ class Log():
         file_handler.setFormatter(formatter)
         self.logger.addHandler(file_handler)
 
-    def write_log(self, msg):
+    def write(self, msg):
         """ 
         def description : 로그 작성
 

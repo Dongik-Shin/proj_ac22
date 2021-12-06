@@ -278,7 +278,6 @@ class Upbit():
 
             except Exception as ex:
                 time.sleep(0.25)
-                pass
 
     def get_cross_state(self):
         """ 
@@ -302,6 +301,82 @@ class Upbit():
             state = "DC"
 
         return state
+
+    def get_target_hour_avg_price(self, target_hour, count=10):
+        """ 
+        def description : 타겟 시간 전 평균 가 산출 
+
+        Parameters
+        ----------
+        target_hour : 타겟 시간
+        count : 분단위 데이터 갯수
+
+        Returns
+        -------
+        avg_close : 평균 종가
+        """
+
+        # 총 10회 시도
+        for i in range(0, 10):
+            target_min = int(target_hour * 60 + (count/2))
+
+            try:
+                df = pyupbit.get_ohlcv(
+                    self.ticker, interval="minute1", count=target_min + 1)
+
+                sum_close = 0
+                for j in range(0, count):
+                    sum_close += df['close'][j]
+
+                avg_close = sum_close / count
+                return avg_close
+
+            except Exception as ex:
+                pass
+
+        return None
+
+    def get_target_day_avg_price(self, target_day, count=4):
+        """ 
+        def description : 타겟 일 전 평균 가 산출 
+
+        Parameters
+        ----------
+        target_hour : 타겟 시간
+        count : 분단위 데이터 갯수
+
+        Returns
+        -------
+        avg_close : 평균 종가
+        """
+
+        # 총 10회 시도
+        for i in range(0, 10):
+            target_hour = int(target_day * 24 + (count/2))
+
+            try:
+                df = pyupbit.get_ohlcv(
+                    self.ticker, interval="minute60", count=target_hour+1)
+
+                sum_close = 0
+                for j in range(0, count):
+                    sum_close += df['close'][j]
+
+                avg_close = sum_close / count
+                return avg_close
+
+            except Exception as ex:
+                pass
+
+        return None
+
+    def get_wait_order(self):
+
+        order = None
+        if self.ticker:
+            order = self.upbit.get_order(self.ticker, state="wait")
+
+        return order
 
     def is_golden_crossed(self):
         """ 
@@ -422,8 +497,8 @@ class Upbit():
 
             if krw_order:
                 ticker_balance = krw_order
-            
-            else: 
+
+            else:
                 self.ticker = self.ticker.replace("KRW-", "")
                 ticker_balance = self.get_my_balance()
                 self.ticker = org_ticker
@@ -459,72 +534,3 @@ class Upbit():
                 "message": str(ex)
             }
             return response_object
-        
-
-    def get_target_hour_avg_price(self, target_hour, count=10):
-        """ 
-        def description : 타겟 시간 전 평균 가 산출 
-
-        Parameters
-        ----------
-        target_hour : 타겟 시간
-        count : 분단위 데이터 갯수
-
-        Returns
-        -------
-        avg_close : 평균 종가
-        """
-
-        # 총 10회 시도
-        for i in range(0, 10):
-            target_min = int(target_hour * 60 + (count/2))
-
-            try:
-                df = pyupbit.get_ohlcv(
-                    self.ticker, interval="minute1", count=target_min + 1)
-
-                sum_close = 0
-                for j in range(0, count):
-                    sum_close += df['close'][j]
-
-                avg_close = sum_close / count
-                return avg_close
-
-            except Exception as ex:
-                pass
-
-        return None
-
-    def get_target_day_avg_price(self, target_day, count=4):
-        """ 
-        def description : 타겟 일 전 평균 가 산출 
-
-        Parameters
-        ----------
-        target_hour : 타겟 시간
-        count : 분단위 데이터 갯수
-
-        Returns
-        -------
-        avg_close : 평균 종가
-        """
-
-        # 총 10회 시도
-        for i in range(0, 10):
-            target_hour = int(target_day * 24 + (count/2))
-
-            try:
-                df = pyupbit.get_ohlcv(
-                    self.ticker, interval="minute60", count=target_hour+1)
-
-                sum_close = 0
-                for j in range(0, count):
-                    sum_close += df['close'][j]
-
-                avg_close = sum_close / count
-                return avg_close
-
-            except Exception as ex:
-                pass
-
-        return None

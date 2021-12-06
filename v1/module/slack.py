@@ -11,7 +11,7 @@ class Slack():
         self.webhook_url = os.getenv(
             "SLACK_WEBHOOK_URL")
 
-    def post_to_slack(self, msg):
+    def post(self, msg):
         """ 
         def description : 슬랙 메세지 전송 
 

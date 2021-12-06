@@ -31,9 +31,8 @@ def cross_state_for_all_KRW():
     DC_list = []
     for ticker in KRW_tickers:
 
+        # cross_state 추출 및 그룹핑
         upbit.set_ticker(ticker)
-
-        # get_cross_state
         current_price = upbit.get_current_price()
         cross_state = upbit.get_cross_state()
 
@@ -76,14 +75,14 @@ def cross_state_for_all_KRW():
     DC_list = sort_by_current_price(DC_list)
 
     # 출력
-    log.write_log("golden crossed list")
-    log.write_log(json.dumps(GC_list, indent=4))
-    log.write_log("dead crossed list")
-    log.write_log(json.dumps(DC_list, indent=4))
-    log.write_log("super golden crossed list")
-    log.write_log(json.dumps(SGC_list, indent=4))
-    log.write_log("super dead crossed list")
-    log.write_log(json.dumps(SDC_list, indent=4))
+    log.write("golden crossed list")
+    log.write(json.dumps(GC_list, indent=4))
+    log.write("dead crossed list")
+    log.write(json.dumps(DC_list, indent=4))
+    log.write("super golden crossed list")
+    log.write(json.dumps(SGC_list, indent=4))
+    log.write("super dead crossed list")
+    log.write(json.dumps(SDC_list, indent=4))
     return
 
 
@@ -114,12 +113,12 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
 
     # start 메세지 전송
     msg_s = f"monitoring start!, ticker : {ticker}, started at : {datetime.datetime.now()}"
-    slack.post_to_slack(msg_s)
+    slack.post(msg_s)
 
     # log 생성
     log.create_log(
         f"{os.path.abspath(os.curdir)}/log/{str(generate_now_day())}")
-    log.write_log(msg_s)
+    log.write(msg_s)
 
     # mongo DB 셋팅
     ticker_col = ticker.replace("-", "_")
@@ -156,14 +155,14 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
             if changes_5min:
                 if changes_5min > in_sudden_check:
                     msg = f"ticker : {ticker}, sudden increase, current_price : {current_price}"
-                    slack.post_to_slack(msg)
-                    log.write_log(msg)
+                    slack.post(msg)
+                    log.write(msg)
                     in_sudden_check += 0.05
 
                 if changes_5min < de_sudden_check:
                     msg = f"ticker : {ticker}, sudden decrease, current_price : {current_price}"
-                    slack.post_to_slack(msg)
-                    log.write_log(msg)
+                    slack.post(msg)
+                    log.write(msg)
                     de_sudden_check -= 0.05
 
             # 주기별 서든 값 초기화
@@ -175,13 +174,13 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
             # cross_state 변화 체크
             cross_state = upbit.get_cross_state()
 
-            if cross_state:
-                if loop_cnt != 0:
+            if loop_cnt != 0:
+                if cross_state:
                     prev_cross_state = mongo.get_doc_one()["cross_state"]
                     if prev_cross_state != cross_state:
                         msg = f"ticker : {ticker}, cross changed, cross_state : {cross_state}, current_price : {current_price}"
-                        slack.post_to_slack(msg)
-                        log.write_log(msg)
+                        slack.post(msg)
+                        log.write(msg)
 
             # 신규데이터 삽입
             post = {
@@ -232,11 +231,10 @@ def monitoring(ticker="KRW-BTC", report_term=30, sudden_term=5, sudden_per=0.5, 
                     day_7_before_price: {day_7_before_price}, {day_7_before_rate}%
                     """
                 time.sleep(0.15)
-                pass
 
         except Exception as ex:
-            log.write_log(str(ex))
-            log.write_log("=====================")
+            log.write(str(ex))
+            log.write("=====================")
             time.sleep(3)
 
 
@@ -257,8 +255,8 @@ def catch_krw_new_public():
 
     # start 메세지 전송
     msg = f"catch_new_krw_public start!, started at : {datetime.datetime.now()}"
-    slack.post_to_slack(msg)
-    log.write_log(msg)
+    slack.post(msg)
+    log.write(msg)
 
     # 기능 변수
     time_cut = 360
@@ -266,7 +264,7 @@ def catch_krw_new_public():
     try_flag = False
     balance_status = "keep"
     flag_time = time.time()                  # 시간 체커
-    report_term = 86400
+    report_term = 3600
 
     # 기존 티커 리스트
     KRW_tickers_old = upbit.get_KRW_tickers()
@@ -288,6 +286,11 @@ def catch_krw_new_public():
                 if diff_ticker_cnt > 0:
                     if new_cnt > old_cnt:
 
+                        # 매수 시도 시간 갱신
+                        if try_flag == False:
+                            buy_time = time.time()
+                            try_flag = True
+
                         # 매수 시도
                         new_ticker = list(diff_ticker)[0]
                         upbit.set_ticker(new_ticker)
@@ -295,60 +298,60 @@ def catch_krw_new_public():
                         if response["status"] == "success":
                             balance_status == "buy"
                             msg = f"new_ticker : {new_ticker}, buying success"
-                            slack.post_to_slack(msg)
-                            slack.post_to_slack(msg)
-                            slack.post_to_slack(msg)
-                            slack.post_to_slack(msg)
-                            slack.post_to_slack(msg)
-                            log.write_log(msg)
+                            for i in range(0, 5):
+                                slack.post(msg)
+
+                            log.write(msg)
 
                         # 매수 실패
                         else:
                             msg = f"new_ticker : {new_ticker}, buying fail"
-                            slack.post_to_slack(msg)
-                            slack.post_to_slack(msg)
-                            slack.post_to_slack(msg)
-                            slack.post_to_slack(msg)
-                            slack.post_to_slack(msg)
-                            log.write_log(msg)
+                            for i in range(0, 5):
+                                slack.post(msg)
 
-                        # 매수 시도 시간 갱신
-                        if try_flag == False:
-                            buy_time = time.time()
-
-                        try_flag = True
+                            log.write(msg)
 
             # 매수 이후
             else:
+                # TODO 미체결 확인로직 추가
+                # 타임 컷 이후에 미체결 취소하는 로직 추가 (아쉽지만 빡종)
+                # 타임컷 내 매수 성공시 타임컷 되는 순간 매도 시도 (맛잇게 먹기)
+
                 # 매수 시도 시점을 기점으로 타임 컷 실행
                 if cal_time_changes(buy_time) > time_cut:
 
                     # 매도 시도
                     response = upbit.sell_coin()
+
+                    # 매도 성공
                     if response["status"] == "success":
                         msg = f"new_ticker : {new_ticker}, selling success"
-                        slack.post_to_slack(msg)
-                        log.write_log(msg)
+                        slack.post(msg)
+                        log.write(msg)
                         return
 
                     # 매도 실패
                     else:
                         msg = f"new_ticker : {new_ticker}, selling fail"
-                        slack.post_to_slack(msg)
-                        log.write_log(msg)
+                        for i in range(0, 5):
+                            slack.post(msg)
+
+                        log.write(msg)
 
             # report_term 간격으로 변수 셋팅
             if cal_time_changes(flag_time) > report_term:
                 KRW_tickers_old = upbit.get_KRW_tickers()
+                print(KRW_tickers_old)
                 old_cnt = len(KRW_tickers_old)
+                print(old_cnt)
                 flag_time = time.time()
 
                 msg = f"no changes, time : {datetime.datetime.now()}"
-                log.write_log(msg)
+                log.write(msg)
 
             time.sleep(0.05)
 
         except Exception as ex:
-            log.write_log(str(ex))
-            log.write_log("=====================")
+            log.write(str(ex))
+            log.write("=====================")
             time.sleep(3)
